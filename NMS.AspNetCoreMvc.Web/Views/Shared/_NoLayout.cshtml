@@ -1,0 +1,20 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - NMS.AspNetCoreMvc.Web</title>
+
+    <link rel="stylesheet" href="~/lib/KendoUI/styles/default-ocean-blue.css" />
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/KendoUI/js/kendo.all.min.js"></script>
+</head>
+<body>
+    <div>
+        <main role="main">
+            @RenderBody()
+        </main>
+    </div>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

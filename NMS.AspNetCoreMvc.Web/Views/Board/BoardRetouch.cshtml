@@ -1,0 +1,99 @@
+﻿@model NMS.AspNetCoreMvc.Web.Models.DB.Board
+
+@{
+    ViewData["Title"] = "BoardRetouch";
+}
+
+@section Scripts {
+    <script type="text/javascript">
+        var ddlBoardCategory, validator, editor;
+        $(document).ready(function () {
+            $("#txtBoardTitle").kendoTextBox({
+            });
+            editor = $("#txtBoardContent").kendoEditor({
+            }).data("kendoEditor");
+            editor.value(DecodeHTMLEntities_Common($("#hdnBoardContent").val()));
+
+            // 카테고리 필터 생성
+            ddlBoardCategory = $("#ddlBoardCategory").kendoDropDownList({
+                autoBind: false,
+                dataTextField: "CategoryName",
+                dataValueField: "CategoryName",
+                dataSource: {
+                    transport: {
+                        read: {
+                            type: "POST",
+                            url: '/CommonApi/BoardCategory',
+                            contentType: "application/json; charset=UTF-8",
+                            dataType: "json",
+                            async: false
+                        }
+                    }
+                }
+            }).data("kendoDropDownList");
+
+            // kendo validator
+            validator = $("#boardWriteForm").kendoValidator({
+                rules: {
+                    customRule1: function (input) {
+                        if (input.is("[id=txtBoardTitle]")) {
+                            let value = /^[ㄱ-ㅎ가-힣a-zA-Z\s]/g;
+                            return value.test(input.val());
+                        }
+                        return true;
+                    },
+                    customRule2: function (input) {
+                        if (input.is("[id=txtBoardTitle]")) {
+                            let value = /^[ㄱ-ㅎ가-힣a-zA-Z\s]{1,50}$/;
+                            return value.test(input.val());
+                        }
+                        return true;
+                    },
+                    customRule3: function (input) {
+                        if (input.is("[id=txtBoardContent]")) {
+                            if (input.val().length > 0) {
+                                $("#hdnBoardContent").val(input.val())
+                            }
+                            return input.val().length > 0;
+                        }
+                        return true;
+                    },
+                    customRule4: function (input) {
+                        if (input.is("[id=ddlBoardCategory]")) {
+                            return input.val() != "";
+                        }
+                        return true;
+                    }
+                },
+                messages: {
+                    required: "정보를 입력하세요.",
+                    customRule1: "한글과 영어만 사용할 수 있습니다.",
+                    customRule2: "1글자 이상 50글자 이하여야 합니다.",
+                    customRule3: "글 내용이 없습니다.",
+                    customRule4: "카테고리를 선택하세요."
+                }
+            }).data("kendoValidator");
+        });
+    </script>
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
+<div>
+    <form id="boardWriteForm" class="k-form k-form-vertical" data-role="validator" novalidate="novalidate" asp-controller="Board" asp-action="BoardRetouch" method="post">
+        <input type="hidden" asp-for="No" />
+        <input type="hidden" id="hdnBoardContent" asp-for="BoardContent" />
+        <div style="margin-top: 20px;">
+            <span class="k-d-inline-block">제목</span>
+            <input type="text" id="txtBoardTitle" asp-for="Title" />
+        </div>
+        <div style="margin-top: 20px; margin-bottom: 20px;">
+            <span>카테고리&nbsp;</span>
+            <input type="text" id="ddlBoardCategory" asp-for="Category" style="width: 200px;" />
+        </div>
+        <textarea id="txtBoardContent" rows="10" cols="30" style="width:100%; height:450px" aria-label="editor"></textarea>
+        <div style="text-align: center;">
+            <input type="submit" value="저장" class="k-button k-button-solid-base k-button-solid k-button-md k-rounded-md" style="margin: 20px auto;" />
+        </div>
+    </form>
+</div>

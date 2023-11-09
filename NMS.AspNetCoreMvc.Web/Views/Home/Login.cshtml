@@ -1,0 +1,55 @@
+﻿@model NMS.AspNetCoreMvc.Web.Models.DB.User
+
+@{
+    Layout = "~/Views/Shared/_NoLayout.cshtml";
+    ViewData["Title"] = "Login";
+    if (TempData["RouteController"] == null || TempData["RouteAction"] == null)
+    {
+        TempData["RouteController"] = "Home";
+        TempData["RouteAction"] = "Main";
+    }
+}
+
+@section Scripts {
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $("#loginForm").kendoForm({
+                orientation: "vertical",
+                buttonsTemplate: '<button class="k-form-submit k-button k-button-md k-rounded-md k-button-solid k-button-solid-primary" type="submit">로그인</button>',
+                formData: {
+                    ID: "test",
+                    Password: "1234"
+                },
+                items: [{
+                    type: "group",
+                    items: [
+                        { field: "ID", label: "아이디", validation: { required: { message: "아이디를 입력하세요." } } },
+                        { field: "Password", label: "비밀번호", validation: { required: { message: "비밀번호를 입력하세요." } } }
+                    ]
+                }],
+                validateField: function (e) {
+                    // 값이 기준에 안맞을 경우 이벤트
+                },
+                submit: function (e) {
+                    // 값이 기준에 맞을경우 이벤트
+                    // e.preventDefault(); // 이벤트 정지
+                    $("#hdnUserId").val(e.model.ID);
+                    $("#hdnUserPassword").val(e.model.Password);
+                }
+            });
+        });
+    </script>
+}
+
+<div>
+    @if (ViewData.ModelState["Error"] != null && ViewData.ModelState["Error"].Errors.Count > 0)
+    {
+        <div class='k-messagebox k-messagebox-error'>@ViewData.ModelState["Error"].Errors.First().ErrorMessage</div>
+    }
+    <form id="loginForm" asp-controller="Home" asp-action="Login" method="post"
+          asp-route-RouteController="@TempData["RouteController"]" asp-route-RouteAction="@TempData["RouteAction"]">
+        <input type="hidden" id="hdnUserId" asp-for="ID" />
+        <input type="hidden" id="hdnUserPassword" asp-for="Password" />
+    </form>
+</div>
+

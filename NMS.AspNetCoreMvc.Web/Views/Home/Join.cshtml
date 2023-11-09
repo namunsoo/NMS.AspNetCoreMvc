@@ -1,0 +1,139 @@
+﻿@model NMS.AspNetCoreMvc.Web.Models.DB.User
+
+@{
+    Layout = "~/Views/Shared/_NoLayout.cshtml";
+	ViewData["Title"] = "Join";
+}
+
+@section Scripts {
+    <script type="text/javascript">
+        var validator, idCheck;
+        $(document).ready(function () {
+            // 기본값 설정
+            idCheck = false;
+
+            // kendoTextBox ui 적용
+            $("#name").kendoTextBox();
+            $("#id").kendoTextBox();
+            $("#password").kendoTextBox();
+            $("#passwordCheck").kendoTextBox();
+
+            // kendo validator
+            validator = $("#joinForm").kendoValidator({
+                rules: {
+                    customRule1: function (input) {
+                        if (input.is("[id=name]")) {
+                            let value = /^[ㄱ-ㅎ가-힣a-zA-Z\s]/g;
+                            return value.test(input.val());
+                        }
+                        return true;
+                    },
+                    customRule2: function (input) {
+                        if (input.is("[id=id]")) {
+                            let value = /^[a-zA-Z\s]/g;
+                            return value.test(input.val());
+                        }
+                        return true;
+                    },
+                    customRule3: function (input) {
+                        if (input.is("[id=password]")) {
+                            let value = /[a-zA-Z\s](?=.*?[#?!@@$%^&*-]).{8,}$/;
+                            return value.test(input.val());
+                        }
+                        return true;
+                    },
+                    customRule4: function (input) {
+                        if (input.is("[id=passwordCheck]")) {
+                            return $("#password").val() === input.val();
+                        }
+                        return true;
+                    }
+                },
+                messages: {
+                    required: function (input) {
+                        return input.attr("name")+" 을/를 입력하세요.";
+                    },
+                    customRule1: "한글과 영어만 사용할 수 있습니다.",
+                    customRule2: "영어만 사용 가능합니다.",
+                    customRule3: "특수문자를 포함한 8자리 이상이여야 합니다.",
+                    customRule4: "비밀번호가 다릅니다."
+                }
+            }).data("kendoValidator");
+        });
+
+        function Join(e) {
+            var validator = $("#joinForm").data("kendoValidator");
+            if (validator.validate()) {
+                $.ajax({
+                    type: "POST",
+                    url: '/CommonApi/IsIdAvailable',
+                    contentType: "application/json; charset=UTF-8",
+                    data: JSON.stringify({
+                        ID: $("#id").val()
+                    }),
+                    dataType: "json",
+                    async: false,
+                    success: function (result) {
+                        idCheck = result;
+                        if (!result) {
+                            alert("이미 사용중인 아이디입니다.");
+                            $("#id").val("");
+                        } else {
+                            $("#hdnUserName").val($("#name").val());
+                            $("#hdnUserId").val($("#id").val());
+                            $("#hdnUserPassword").val($("#password").val());
+                            $("#joinForm").trigger("submit");
+                        }
+                    },
+                    error: function (request, status, error) {
+                        console.log(error)
+                    }
+                });
+            }
+        }
+    </script>
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
+
+<div>
+    @if (ViewData.ModelState["Error"] != null && ViewData.ModelState["Error"].Errors.Count > 0)
+    {
+        <div class='k-messagebox k-messagebox-error'>@ViewData.ModelState["Error"].Errors.First().ErrorMessage</div>
+    }
+    <form id="joinForm" class="k-form k-form-vertical" data-role="validator" novalidate="novalidate" asp-controller="Home" asp-action="Join" method="post">
+        <ul class="k-form-group">
+            <li class="k-form-field">
+                <label for="name" class="k-form-label">닉네임</label>
+                <span class="k-form-field-wrap">
+                    <input type="text" name="닉네임" id="name" required="required" />
+                </span>
+            </li>
+            <li class="k-form-field">
+                <label for="id" class="k-form-label">아이디</label>
+                <span class="k-form-field-wrap">
+                    <input type="text" name="아이디" id="id" required="required" />
+                </span>
+            </li>
+            <li class="k-form-field">
+                <label for="password" class="k-form-label">비밀번호</label>
+                <span class="k-form-field-wrap">
+                    <input type="text" name="비밀번호" id="password" required="required" />
+                </span>
+            </li>
+            <li class="k-form-field">
+                <label for="passwordCheck" class="k-form-label">비밀번호 확인</label>
+                <span class="k-form-field-wrap">
+                    <input type="text" name="비밀번호 확인" id="passwordCheck" required="required" />
+                </span>
+            </li>
+            <li class="k-form-buttons">
+                <button type="button" class="k-button k-button-solid-primary k-button-solid k-button-md k-rounded-md" data-role="button" onclick="Join()">회원가입</button>
+            </li>
+        </ul>
+        <input type="hidden" id="hdnUserName" asp-for="Name" />
+        <input type="hidden" id="hdnUserId" asp-for="ID" />
+        <input type="hidden" id="hdnUserPassword" asp-for="Password" />
+    </form>
+</div>

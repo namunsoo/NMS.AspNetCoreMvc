@@ -1,0 +1,48 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.7.34031.279
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "00_DB", "00_DB", "{20418F7E-E162-4944-BD3C-B1408ED490C1}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "01_UI", "01_UI", "{3FAEEE91-7370-445D-8413-6AE241FDA10B}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "02_Common", "02_Common", "{2291D9FA-74BC-4348-AAB5-2F77D0A66757}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NMS.AspNetCoreMvc.Web", "NMS.AspNetCoreMvc.Web\NMS.AspNetCoreMvc.Web.csproj", "{32E018FE-4F40-4CEE-91BD-83E5D28C8D65}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NMS.AspNetCoreMvc.Common", "NMS.AspNetCoreMvc.Common\NMS.AspNetCoreMvc.Common.csproj", "{C3140697-C742-4852-B474-5D709AA6962D}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "03_AI", "03_AI", "{870A80C2-3895-42B9-ABE9-5BF54298A732}"
+EndProject
+Project("{888888A0-9F3D-457C-B088-3A5042F75D52}") = "AI_Test", "AI_Test\AI_Test.pyproj", "{E09FDF77-6A42-4720-88D9-39AD6C4C4AB2}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{32E018FE-4F40-4CEE-91BD-83E5D28C8D65}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{32E018FE-4F40-4CEE-91BD-83E5D28C8D65}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{32E018FE-4F40-4CEE-91BD-83E5D28C8D65}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{32E018FE-4F40-4CEE-91BD-83E5D28C8D65}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C3140697-C742-4852-B474-5D709AA6962D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C3140697-C742-4852-B474-5D709AA6962D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C3140697-C742-4852-B474-5D709AA6962D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C3140697-C742-4852-B474-5D709AA6962D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E09FDF77-6A42-4720-88D9-39AD6C4C4AB2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E09FDF77-6A42-4720-88D9-39AD6C4C4AB2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{32E018FE-4F40-4CEE-91BD-83E5D28C8D65} = {3FAEEE91-7370-445D-8413-6AE241FDA10B}
+		{C3140697-C742-4852-B474-5D709AA6962D} = {2291D9FA-74BC-4348-AAB5-2F77D0A66757}
+		{E09FDF77-6A42-4720-88D9-39AD6C4C4AB2} = {870A80C2-3895-42B9-ABE9-5BF54298A732}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {F8F7CD43-6430-42B4-8FDE-58C3E8DDB2FD}
+	EndGlobalSection
+EndGlobal

@@ -1,0 +1,126 @@
+﻿@using Microsoft.AspNetCore.Http
+@inject IHttpContextAccessor Accessor
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - NMS.AspNetCoreMvc.Web</title>
+
+    @* <link rel="stylesheet" href="~/lib/KendoUI/styles/default-ocean-blue.css" /> *@
+    <link rel="stylesheet" href="~/lib/KendoUI/styles/default-custom-nms.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/NMS.AspNetCoreMvc.Web.styles.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/reset.css" asp-append-version="true" />
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/KendoUI/js/kendo.all.min.js"></script>
+    <script src="~/js/common.js" asp-append-version="true"></script>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $("#toolbar").kendoToolBar({
+                items: [
+                    { type: "contentItem", template: '<a id="toggleDrawer" onclick="toggleDrawer()" class="k-button k-button-md k-button-rectangle k-rounded-md k-button-solid k-button-solid-base" style="border:0px; background:\\#FFFFFF;">' + kendo.ui.icon({ icon: 'menu', size: 'xxlarge' }) + '</a>' },
+                    { template: '<a style="text-decoration: none; color: #424242; margin-left: 30px;" href="/"><h2>NMS</h2></a>' },
+                    { type: "spacer" },
+                    { template: '<a href="/Lean/Memorize">암기(테스트 중)</a>' },
+                    { template: '<a style="text-decoration: none; color: #424242; margin-left: 30px;" href="/Board/BoardList"><h4>게시판</h4></a>' },
+                    { type: "spacer" },
+                    { type: "spacer" },
+                    { template: '<a role="button" id="btnLogIn" class="k-button k-button-solid-base k-button-solid k-button-md k-rounded-md" href="/Home/Login">로그인</a>' },
+                    { template: '<a role="button" id="btnJoin" class="k-button k-button-solid-base k-button-solid k-button-md k-rounded-md" href="/Home/Join">회원가입</a>' },
+                    { template: '<a role="button" id="btnLogOut" class="k-button k-button-solid-base k-button-solid k-button-md k-rounded-md" href="/Home/Logout">로그아웃</a>' },
+                    { template: '<a role="button" id="btnMyInfo" class="k-button k-button-solid-base k-button-solid k-button-md k-rounded-md" href="/Home/MyInfo">내정보</a>' }
+                ]
+            });
+
+            $("#drawer").kendoDrawer({
+                template: "<ul> \
+                            <li data-role='drawer-item' class='k-selected'>"+ kendo.ui.icon({ icon: 'inbox' }) + "<span class='k-item-text' data-id='Inbox'>Inbox</span></li> \
+                            <li data-role='drawer-separator'></li> \
+                            <li data-role='drawer-item'>"+ kendo.ui.icon({ icon: 'bell' }) + "<span class='k-item-text' data-id='Notifications'>Notifications</span></li> \
+                            <li data-role='drawer-item'>"+ kendo.ui.icon({ icon: 'calendar' }) + "<span class='k-item-text' data-id='Calendar'>Calendar</span></li> \
+                            <li data-role='drawer-separator'></li> \
+                            <li data-role='drawer-item'>"+ kendo.ui.icon({ icon: 'envelop-link' }) + "<span class='k-item-text' data-id='Attachments'>Attachments</span></li> \
+                            <li data-role='drawer-item'>"+ kendo.ui.icon({ icon: 'star-outline' }) + "<span class='k-item-text' data-id='Favourites'>Favourites</span></li> \
+                        </ul>",
+                mode: "push",
+                itemClick: function (e) {
+                    if (!e.item.hasClass("k-drawer-separator")) {
+                        // e.sender.drawerContainer.find("#drawer-content > div").addClass("hidden");
+                        // e.sender.drawerContainer.find("#drawer-content").find("#" + e.item.find(".k-item-text").attr("data-id")).removeClass("hidden");
+                    }
+                },
+                autoCollapse: false,
+                position: 'left',
+                minHeight: 330,
+                width: 180,
+                maxHeight: 'calc(100% - 35px)',
+                swipeToOpen: false
+            });
+
+            // 로그인 로그아웃 kendoToolBar 변경
+            LoginCheck();
+
+        });
+
+        function toggleDrawer() {
+            var drawerInstance = $("#drawer").data().kendoDrawer;
+            var drawerContainer = drawerInstance.drawerContainer;
+
+            if (drawerContainer.hasClass("k-drawer-expanded")) {
+                drawerInstance.hide("");
+            } else {
+                drawerInstance.show("");
+            }
+        }
+    </script>
+    <style>
+        html,
+        body {
+            width: 100%;
+            height: 100%;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div id="toolbar"></div>
+        @if (@ViewData["IsLogin"] != null && @ViewData["IsLogin"].ToString() == "true")
+        {
+            <script type="text/javascript">
+                function LoginCheck() {
+                    $('#btnLogIn').css('display', 'none');
+                    $('#btnJoin').css('display', 'none');
+                    $('#btnLogOut').css('display', 'block');
+                    $('#btnMyInfo').css('display', 'block');
+                }
+            </script>
+        } else
+        {
+            <script type="text/javascript">
+                function LoginCheck() {
+                    $('#btnLogIn').css('display', 'block');
+                    $('#btnJoin').css('display', 'block');
+                    $('#btnLogOut').css('display', 'none');
+                    $('#btnMyInfo').css('display', 'none');
+                }
+            </script>
+        }
+    </header>
+    <main role="main">
+        <div id="drawer">
+            <div id="main-container">
+                <div id="container-item">
+                    @RenderBody()
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <div id="footer-container">
+            &copy; 2023 - NMS.AspNetCoreMvc.Web
+        </div>
+    </footer>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

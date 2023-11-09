@@ -1,0 +1,39 @@
+﻿@charset "UTF-8";
+
+#board {
+    min-height: 80vh;
+    margin: 20px auto;
+    background-color: #E3CAA5;
+    border-radius: 10px;
+}
+
+    #board .boardMargin {
+        height: 10px;
+    }
+
+    #board #boardTitle {
+        width: 95%;
+        margin: 0 auto;
+        padding: 10px 0;
+        text-align: center;
+        background-color: #FFFBE9;
+        border-radius: 5px;
+    }
+
+    #board #boardContent {
+        height: 60vh;
+        width: 95%;
+        margin: auto;
+        padding: 10px 0;
+        background-color: #FFFBE9;
+        border-radius: 5px;
+    }
+
+    #board #boardData {
+        width: 95%;
+        margin: 0 auto;
+        padding: 10px 0;
+        text-align: center;
+        background-color: #FFFBE9;
+        border-radius: 5px;
+    }

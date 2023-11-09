@@ -1,0 +1,54 @@
+﻿@charset "UTF-8";
+
+#toolbar {
+    height: 50px;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    background-color: #f1f1f1;
+}
+
+#drawer {
+    position: fixed;
+    top: 50px;
+    bottom: 35px;
+    left: 0;
+    background-color: #f6f6f6;
+    border-right: 1px solid #e6e6e6;
+    z-index: 1;
+}
+
+#main-container {
+    width: 100%;
+    height: calc(100vh - 85px);
+    margin: 50px auto 35px auto;
+    overflow-y: scroll;
+    background-color: #fafafa;
+    z-index: -1;
+}
+    #main-container::-webkit-scrollbar {
+        display: none;
+    }
+
+    #main-container #container-item {
+        width: 80%;
+        margin-left: auto;
+        margin-right: auto;
+    }
+footer {
+    height: 35px;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background-color: #e7ebf5;
+}
+
+#footer-container {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+}

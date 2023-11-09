@@ -1,0 +1,28 @@
+﻿@model NMS.AspNetCoreMvc.Web.Models.DB.Board
+
+@{
+	ViewData["Title"] = "BoardList";
+}
+
+@section Scripts {
+    <script type="text/javascript">
+        $(document).ready(function () {
+            const content = DecodeHTMLEntities_Common(DecodeHTMLEntities_Common('@Html.DisplayFor(model => model.BoardContent)'));
+            $("#boardContent").append(content);
+
+        });
+        //# sourceURL=debugScript
+    </script>
+}
+<div id="board">
+    <div class="boardMargin"></div>
+	<div id="boardTitle">@Html.DisplayFor(model => model.Title)</div>
+    <div class="boardMargin"></div>
+    <div id="boardContent"></div>
+    <div class="boardMargin"></div>
+    <div id="boardData">
+        작성자:&nbsp;@Html.DisplayFor(model => model.CreateUserName)&nbsp;&#47;&nbsp;
+        작성일:&nbsp;@Html.DisplayFor(model => model.CreateDate)
+    </div>
+    <div class="boardMargin"></div>
+</div>

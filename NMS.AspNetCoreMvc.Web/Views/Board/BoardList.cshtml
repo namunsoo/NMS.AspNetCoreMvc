@@ -1,0 +1,219 @@
+﻿@{
+    ViewData["Title"] = "BoardList";
+}
+
+@section Scripts {
+    <script type="text/javascript">
+		var gridDataSource, gridBoardList, toolbarTemplate, categoryFilterData, ddlCategory;
+        $(document).ready(function () {
+
+			toolbarTemplate = kendo.template(
+				"<div class='k-grid-toolbar k-toolbar k-toolbar-resizable k-toolbar-md' style='width: 100%;'>" + 
+				"<div id='filterArea'>" +
+				"<label for='ddlCategory' style='margin-left:6px;'>카테고리:&nbsp;</label><input id='ddlCategory' />" +
+				"</div>" +
+				"<div class='k-spacer'></div>" +
+				"<div class='k-spacer'></div>" +
+				"<span class='k-searchbox k-input k-input-md k-rounded-md k-input-solid k-grid-search' style='width: 200px;'>" +
+				"<span class='k-input-icon k-icon k-i-search'></span>" +
+					"<input type='search' id='searchbox' onkeydown='if (event.keyCode == 13) {return false;}' placeholder='검색어를 입력하세요' title='검색어를 입력하세요' class='k-input-inner' style='width: 150px'/>" +
+				"</span >" +
+				"<div class='k-spacer'></div>" +
+				"<button type='button' class='k-button k-button-solid-base k-button-solid k-button-md k-rounded-md' onclick=\"location.href='/Board/BoardWrite'\">글쓰기</button></div>"
+			);
+			//grid에 사용할 초기 data
+			GetGridata();
+
+			// grid 그리기
+			gridBoardList = $("#gridBoardList").kendoGrid({
+				dataSource: gridDataSource,
+				sortable: true,
+				pageable: {
+					alwaysVisible: true,
+					pageSizes: [5, 15, 25, 50],
+					info: false
+				},
+				toolbar: toolbarTemplate,
+				search: {
+					fields: [{
+						name: "Title",
+						operator: "contains"
+					},
+					{
+						name: "Category",
+						operator: "contains"
+					},
+					{
+						name: "CreateUserName",
+						operator: "contains"
+					},
+					]
+				},
+				columns: [
+					{
+						field: "Title",
+						title: "제목",
+						template: function (e) {
+							let html = "<a style='text-align: left;text-decoration: none; color: #424242;' href='/Board/BoardDetail?No="+e.No+"'>" + e.Title + "</a>";
+							return html;
+						},
+						headerAttributes: {
+							"class": "k-text-center !k-justify-content-center"
+						},
+						attributes: (data) => {
+							return { style: "text-align: left; white-space: nowrap; text-overflow: ellipsis;", title: `${data.Title}` }
+						}
+					},
+					{
+						field: "Category",
+						title: "카테고리",
+						headerAttributes: {
+							"class": "k-text-center !k-justify-content-center"
+						},
+						attributes: {
+							style: "text-align: center"
+						}
+					},
+					{
+						field: "CreateUserName",
+						title: "작성자",
+						headerAttributes: {
+							"class": "k-text-center !k-justify-content-center"
+						},
+						attributes: {
+							style: "text-align: center"
+						}
+					},
+					{
+						field: "CreateDate",
+						title: "작성일",
+						template: function (e) {
+							let date = new Date(e.CreateDate.getTime() + (9 * 60 * 60 * 1000)).toISOString().replace("T", " ").replace(/\..*/, '');
+							return kendo.htmlEncode(date);
+						},
+						headerAttributes: {
+							"class": "k-text-center !k-justify-content-center"
+						},
+						attributes: {
+							style: "text-align: center"
+						}
+					},
+					{
+						template: function (e) {
+							let html = ""
+							if (e.CreateUserCode == '@ViewData["UserCode"]') {
+								html += "<button type='button' class='k-button k-button-solid-base k-button-solid k-button-md k-rounded-md' onclick=\"location.href='/Board/BoardRetouch?No=" + e.No + "'\">수정</button>";
+								html += "<button type='button' class='k-button k-button-solid-base k-button-solid k-button-md k-rounded-md' onclick=\"location.href='/Board/BoardDelete?No=" + e.No + "'\">삭제</button>";
+							}
+							return html;
+						}
+					}
+				],
+				noRecords: {
+					template: "No data."
+				}
+			}).data("kendoGrid");;
+
+			// 카테고리 필터 생성
+			ddlCategory = $("#ddlCategory").kendoDropDownList({
+				autoBind: false,
+				optionLabel: "전체",
+				dataTextField: "CategoryName",
+				dataValueField: "CategoryNo",
+				dataSource: {
+					transport: {
+						read: {
+							type: "POST",
+							url: '/CommonApi/BoardCategory',
+							contentType: "application/json; charset=UTF-8",
+							dataType: "json",
+							async: false
+						}
+					}
+				},
+				change: CategoryChange
+			}).data("kendoDropDownList");
+        });
+
+		function CategoryChange() {
+			if (ddlCategory.value() == "") {
+				GetGridata();
+				gridBoardList.setDataSource(gridDataSource);
+			} else {
+				GetGridata(ddlCategory.value(), ddlCategory.text());
+				gridBoardList.setDataSource(gridDataSource);
+			}
+		}
+
+		function GetGridata(categoryNo, categoryName) {
+			gridDataSource = new kendo.data.DataSource({
+				transport: {
+					read: {
+						url: '/CommonApi/GetBoardList',
+						dataType: "json",
+						type: "POST",
+						async: false,
+						contentType: "application/json; charset=UTF-8"
+					},
+					parameterMap: function (data, type) {
+						return JSON.stringify({
+							CategoryNo: categoryNo === undefined ? 0 : categoryNo,
+							CategoryName: categoryName === undefined ? "" : categoryName,
+							Skip: data.skip,
+							Take: data.take,
+							Sort: data.sort === undefined ? null : data.sort,
+							Filter: data.filter === undefined ? null : data.filter
+						})
+					}
+				},
+				batch: false,
+				pageSize: 2,
+				serverPaging: true,
+				serverSorting: true,
+				serverFiltering: true,
+				schema: {
+					total: "Total",
+					data: "Data",
+					model: {
+						fields: {
+							No: {
+								editable: false
+							},
+							Category: {
+								type: "string"
+							},
+							Title: {
+								type: "string"
+							},
+							BoardContent: {
+								editable: false
+							},
+							CreateUserCode: {
+								editable: false
+							},
+							CreateUserName: {
+								type: "string"
+							},
+							CreateDate: {
+								type: "date"
+							},
+							UpdateUserCode: {
+								editable: false
+							},
+							UpdateUserName: {
+								editable: false
+							},
+							UpdateDate: {
+								editable: false
+							}
+						}
+					}
+				}
+			});
+		}
+    </script>
+}
+
+<div>
+	<div id="gridBoardList" style="margin: 70px 20px 20px 20px;"></div>
+</div>
