@@ -35,8 +35,8 @@ if __name__ == "__main__":
     # print('model :', model.get_weights())
     # # model.summary()
     
-    model = keras.models.load_model('one_letter_230000.keras')
-    print('model :', model.get_weights())
+    # model = keras.models.load_model('test_train_model.keras')
+    # print('model :', model.get_weights())
     # model.summary()
 
     # x_train, y_train = common.GetTrainData(0, 1000,'C:\\Users\\namunsoo\\Downloads\\AI_Data\\OneLetter\\')
@@ -52,9 +52,9 @@ if __name__ == "__main__":
     # # 임시 테스트
     # testImg = cv2.imread('test.png', cv2.IMREAD_GRAYSCALE)
     
-    # model = keras.models.load_model('my_model.keras')
+    # model = keras.models.load_model('test_train_model.keras')
 
-    # test = common.GetImgToData(testImg, 28, 28)
+    # test = common.GetImgToData(testImg, 56, 56)
     # print(test)
     # # Perform inference
     # #predictions = model.predict(test)  # Expand dimensions to create a batch of one image
@@ -69,4 +69,18 @@ if __name__ == "__main__":
     # # recognized_text = ''.join([str(argmax(pred, axis=1).numpy()[0]) for pred in predictions])
 
     # # print("Recognized Text:", recognized_text)
+    
+    model = keras.models.load_model('test_train_model.keras')
+
+    testImg = None
+    testData = None
+    predictions = None
+    labelNum = None
+    for i in range(0,10):
+        testImg = cv2.imread('C:\\Users\\namunsoo\\Downloads\\AI_Data\\OneLetter\\0000000'+str(i)+'.png', cv2.IMREAD_GRAYSCALE)
+        testData = common.GetImgToData(testImg, 56, 56)
+        predictions = model.predict(np.expand_dims(testData, axis=0))  # Expand dimensions to create a batch of one image
+        print(predictions)
+        labelNum = np.where(predictions[0] == 1)[0][0]
+        print(common.GetByText(labelNum))
 

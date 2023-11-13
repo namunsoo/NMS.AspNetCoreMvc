@@ -32,37 +32,46 @@ class Common:
         with open(path, 'r', encoding='UTF8') as f:
             self.json_data = json.load(f)
             for item in self.json_data['annotations']:
-                if len(item['text']) == 1:
+                if item['attributes']['type'] == '글자(음절)':
                     self.label.append(item['text'])
+                    
+        # with open(path, 'r', encoding='UTF8') as f:
+        #     self.json_data = json.load(f)
+        #     for item in self.json_data['annotations']:
+        #         if item(['text']) == 1:
+        #             self.label.append(item['text'])
 
         self.label = list(set(self.label))
 
     # 모델 생성
     def CreateModel(self):
         # AI 모델
-        # model = keras.Sequential([
-        #     keras.layers.Input(shape=(28, 28, 1)),
-        #     keras.layers.Conv2D(32, (3, 3), activation='relu'),
-        #     keras.layers.MaxPooling2D((2, 2)),
-        #     keras.layers.Flatten(),
-        #     keras.layers.Dense(128, activation='relu'),
-        #     keras.layers.Dense(len(self.label), activation='softmax')  # Change 10 to the number of classes in your dataset
-        # ])
-        
         model = keras.Sequential([
-            keras.layers.Flatten(input_shape=(28, 28)),
-            keras.layers.Dense(128, activation='relu'),
-            keras.layers.Dense(len(self.label))
+            keras.layers.Input(shape=(28, 28, 1)),
+            keras.layers.Conv2D(64, (3, 3), activation='relu'),
+            keras.layers.MaxPooling2D((2, 2)),
+            keras.layers.Conv2D(128, (3, 3), activation='relu'),
+            keras.layers.Flatten(),
+            keras.layers.Dense(len(self.label), activation='softmax')  # Change 10 to the number of classes in your dataset
         ])
+        
+        # model = keras.Sequential([
+        #     keras.layers.Flatten(input_shape=(56, 56)),
+        #     keras.layers.Dense(len(self.label))
+        # ])
 
         # 모델 컴파일
         # model.compile(optimizer='adam',
         #           loss=keras.losses.SparseCategoricalCrossentropy(from_logits=True),
         #           metrics=[keras.metrics.SparseCategoricalAccuracy()])
 
-        model.compile(optimizer='adam',
-              loss=keras.losses.SparseCategoricalCrossentropy(from_logits=True),
-              metrics=['accuracy'])
+        # model.compile(optimizer='adam',
+        #       loss=keras.losses.SparseCategoricalCrossentropy(from_logits=True),
+        #       metrics=['accuracy'])
+
+        model.compile(loss=keras.losses.SparseCategoricalCrossentropy(from_logits=True),
+            optimizer=keras.optimizers.Adam(),
+            metrics=['accuracy'])
         return model
     
     # 학습 데이터 가져오기
@@ -77,13 +86,13 @@ class Common:
             if int(item['id']) >= start and int(item['id']) < end:
                 if os.path.isfile(path + item['image_id'] + '.png'):
                     self.img = cv2.imread(path + item['image_id'] + '.png', cv2.IMREAD_GRAYSCALE) # 이미지 가져오기 + 이미지 전처리
-                    self.tempImg = self.GetImgToData(self.img, 28, 28)
+                    self.tempImg = self.GetImgToData(self.img, 56, 56)
                     self.tempLabelIndex = self.label.index(item['text'])
                     self.x_train.append(self.tempImg)
                     self.y_train.append(self.tempLabelIndex)
                     self.count += 1;
 
-        self.x_train = np.asarray(self.x_train).reshape(self.count, 28, 28, 1).astype('float32') / 255.0
+        self.x_train = np.asarray(self.x_train).reshape(self.count, 56, 56, 1).astype('float32') / 255.0
         self.y_train = np.asarray(self.y_train)
         
         return self.x_train, self.y_train, 

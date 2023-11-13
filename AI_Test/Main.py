@@ -32,13 +32,14 @@ if __name__ == "__main__":
     test_loss = None
     test_acc = None
     # 학습
-    for i in range(200000, 532658, 100000):
+    for i in range(0, 532658, 1000):
         # 데이터 가져오기
-        x_train, y_train = common.GetTrainData(i, i+100000,'C:\\Users\\namunsoo\\Downloads\\AI_Data\\OneLetter\\')
+        x_train, y_train = common.GetTrainData(i, i+1000,'C:\\Users\\namunsoo\\Downloads\\AI_Data\\OneLetter\\')
         if len(x_train) > 0 :
             model.fit(x_train, y_train, epochs=5, validation_data=(x_train, y_train))
-            if i % 100000 == 0:
-                model.save('one_letter_'+str(i)+'.keras')
+            print(i+1000)
+            if i+1000 % 10000 == 0:
+                model.save('one_letter_'+str(i+1000)+'.keras')
                 test_loss, test_acc = model.evaluate(x_train, y_train)
                 print(f'Test accuracy: {test_acc}')
     
