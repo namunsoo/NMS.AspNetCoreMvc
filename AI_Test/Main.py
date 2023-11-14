@@ -1,9 +1,7 @@
 # -*- coding:utf-8 -*-
 
 import AI_Common
-from Common import Common as cm
 
-from tensorflow import argmax
 from tensorflow import keras
 import numpy as np
 import cv2
@@ -15,58 +13,52 @@ import os
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 
 if __name__ == "__main__":
+    # OneLetter
+    directory = 'C:\\Users\\namunsoo\\Downloads\\AI_Data\\Test'
+    img_width = 28
+    img_height = 28
+    batch_size = 32
+    train_ds, val_ds = keras.utils.image_dataset_from_directory(
+        directory,
+        labels='inferred',
+        label_mode='categorical',
+        class_names=None,
+        color_mode='grayscale',
+        batch_size=batch_size,
+        image_size=(img_height, img_width),
+        shuffle=True,
+        seed=123,
+        validation_split=0.2,
+        subset="both",
+        crop_to_aspect_ratio=True
+    )
     
-    model = None
-    x_train = None
-    y_train = None
+    # class_names = train_ds.class_names
+    # print(class_names)
     
-    # 기본값 설정
-    common = AI_Common.Common('C:\\Users\\namunsoo\\Downloads\\AI_Data\\Label\\printed_data_info.json')
+    num_classes = len(train_ds.class_names)
+    # print(num_classes)
     
-    # 모델 생성
-    if os.path.isfile('one_letter_100000.keras'):
-        model = keras.models.load_model('one_letter_100000.keras')
-    else:
-        model = common.CreateModel()
-
-    test_loss = None
-    test_acc = None
-    # 학습
-    for i in range(0, 532658, 1000):
-        # 데이터 가져오기
-        x_train, y_train = common.GetTrainData(i, i+1000,'C:\\Users\\namunsoo\\Downloads\\AI_Data\\OneLetter\\')
-        if len(x_train) > 0 :
-            model.fit(x_train, y_train, epochs=5, validation_data=(x_train, y_train))
-            print(i+1000)
-            if i+1000 % 10000 == 0:
-                model.save('one_letter_'+str(i+1000)+'.keras')
-                test_loss, test_acc = model.evaluate(x_train, y_train)
-                print(f'Test accuracy: {test_acc}')
+    model = keras.Sequential([
+        keras.layers.Rescaling(1./255, input_shape=(img_height, img_width, 1)),
+        keras.layers.Conv2D(64, (3, 3), activation='relu'),
+        keras.layers.MaxPooling2D((2, 2)),
+        keras.layers.Conv2D(128, (3, 3), activation='relu'),
+        keras.layers.Flatten(),
+        keras.layers.Dense(num_classes)
+    ])
     
-    # 모델 저장
+    model.compile(loss='categorical_crossentropy',
+        optimizer=keras.optimizers.Adam(),
+        metrics=['accuracy']
+    )
+    
+    model.fit(
+        train_ds,
+        validation_data=val_ds,
+        epochs=5
+    )
+    
     model.save('my_model.keras')
-
-    # # 임시 테스트
-    # textBoxs = cm.ImgToTextBox('test.png')
-    # # for item in textBoxs:
-    # #     cv2.imshow("item", item)
-    # #     cv2.waitKey()
-    # # cv2.destroyAllWindows()
-    
-    # model = keras.models.load_model('my_model_2310000.keras')
-
-    # test = common.GetImgToData(textBoxs[0], 28, 28)
-    # print(test)
-    # # Perform inference
-    # #predictions = model.predict(test)  # Expand dimensions to create a batch of one image
-    # predictions = model.predict(np.expand_dims(test, axis=0))  # Expand dimensions to create a batch of one image
-    # print(len(predictions))
-    # print(len(predictions[0]))
-    # labelNum = np.where(predictions[0] == 1)[0][0]
-    # print(labelNum)
-    # print(common.GetByText(labelNum))
-    # #print()
-    # # Decode the model's output (e.g., using argmax for demonstration)
-    # # recognized_text = ''.join([str(argmax(pred, axis=1).numpy()[0]) for pred in predictions])
-
-    # # print("Recognized Text:", recognized_text)
+    test_loss, test_acc = model.evaluate(val_ds)
+    print(f'Test accuracy: {test_acc}')

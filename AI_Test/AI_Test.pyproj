@@ -4,7 +4,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>e09fdf77-6a42-4720-88d9-39ad6c4c4ab2</ProjectGuid>
     <ProjectHome>.</ProjectHome>
-    <StartupFile>fileRearrange.py</StartupFile>
+    <StartupFile>Main.py</StartupFile>
     <SearchPath>
     </SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
@@ -22,11 +22,12 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="Main.py" />
+    <Compile Include="Test_Main.py" />
     <Compile Include="AI_Common.py" />
     <Compile Include="Common.py" />
     <Compile Include="test.py" />
-    <Compile Include="fileRearrange.py" />
+    <Compile Include="FileRearrange.py" />
+    <Compile Include="Main.py" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets" />
   <!-- Uncomment the CoreCompile target to enable the Build command in

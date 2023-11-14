@@ -46,19 +46,19 @@ class Common:
     # 모델 생성
     def CreateModel(self):
         # AI 모델
-        model = keras.Sequential([
-            keras.layers.Input(shape=(28, 28, 1)),
-            keras.layers.Conv2D(64, (3, 3), activation='relu'),
-            keras.layers.MaxPooling2D((2, 2)),
-            keras.layers.Conv2D(128, (3, 3), activation='relu'),
-            keras.layers.Flatten(),
-            keras.layers.Dense(len(self.label), activation='softmax')  # Change 10 to the number of classes in your dataset
-        ])
-        
         # model = keras.Sequential([
-        #     keras.layers.Flatten(input_shape=(56, 56)),
-        #     keras.layers.Dense(len(self.label))
+        #     keras.layers.Input(shape=(28, 28, 1)),
+        #     keras.layers.Conv2D(64, (3, 3), activation='relu'),
+        #     keras.layers.MaxPooling2D((2, 2)),
+        #     keras.layers.Conv2D(128, (3, 3), activation='relu'),
+        #     keras.layers.Flatten(),
+        #     keras.layers.Dense(len(self.label), activation='softmax')  # Change 10 to the number of classes in your dataset
         # ])
+        
+        model = keras.Sequential([
+            keras.layers.Flatten(input_shape=(56, 56)),
+            keras.layers.Dense(len(self.label))
+        ])
 
         # 모델 컴파일
         # model.compile(optimizer='adam',
