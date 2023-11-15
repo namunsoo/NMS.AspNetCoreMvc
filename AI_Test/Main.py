@@ -14,7 +14,7 @@ os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 
 if __name__ == "__main__":
     # OneLetter
-    directory = 'C:\\Users\\namunsoo\\Downloads\\AI_Data\\Test'
+    directory = 'C:\\Users\\namunsoo\\Downloads\\AI_Data\\OneLetter'
     img_width = 28
     img_height = 28
     batch_size = 32

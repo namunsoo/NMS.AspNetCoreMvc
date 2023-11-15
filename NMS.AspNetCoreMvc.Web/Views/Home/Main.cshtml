@@ -7,19 +7,33 @@
         $(document).ready(function () {
             $("#tilelayout").kendoTileLayout({
                 containers: [{
-                    colSpan: 5,
+                    colSpan: 3,
                     rowSpan: 2,
                     header: {
-                        text: "간단한 게임 만들어보기(아직 안함)"
+                        text: "시계"
                     },
-                    bodyTemplate: kendo.template($("#My-Game-template").html())
-                },{
+                    bodyTemplate: kendo.template($("#My-Clock-template").html())
+                }, {
+                    colSpan: 2,
+                    rowSpan: 2,
+                    header: {
+                        text: "AI 글자 확인 연결?"
+                    },
+                    bodyTemplate: kendo.template($("#My-Signature-template").html())
+                }, {
                     colSpan: 2,
                     rowSpan: 2,
                     header: {
                         text: "구글 지도"
                     },
                     bodyTemplate: kendo.template($("#Gogle-Map-template").html())
+                }, {
+                    colSpan: 3,
+                    rowSpan: 2,
+                    header: {
+                        text: "간단한 게임 만들어보기(아직 안함)"
+                    },
+                    bodyTemplate: kendo.template($("#My-Game-template").html())
                 }],
                 width: "100%",
                 columns: 5,
@@ -46,9 +60,79 @@
                     kendo.resize(e.container, true);
                 }
             });
+
+            CreateClock();
+            setInterval(function () {
+                $("#hour").data("kendoArcGauge").value(new Date().getHours());
+                $("#minute").data("kendoArcGauge").value(new Date().getMinutes());
+                $("#second").data("kendoArcGauge").value(new Date().getSeconds());
+            }, 1000)
+            $(document).bind("kendo:skinChange", function (e) {
+                CreateClock();
+            });
+
+            $("#signature").kendoSignature({
+                maximizable: false,
+                hideLine: true,
+                width: "100%",
+                height: "100%",
+                popupScale: 1
+            });
         });
+
+        function CreateClock() {
+            $("#hour").kendoArcGauge({
+                value: new Date().getHours(),
+                centerTemplate: '<span style="color: #: color #;font-size: 25px;font-weight: 700;">#: value #시</span>',
+                scale: {
+                    min: 0,
+                    max: 24,
+                    startAngle: 90,
+                    endAngle: 360 + 90
+                },
+                colors: [{
+                    color: '#6499E9'
+                }]
+            });
+            $("#minute").kendoArcGauge({
+                value: new Date().getMinutes(),
+                centerTemplate: '<span style="color: #: color #;font-size: 25px;font-weight: 700;">#: value #분</span>',
+                scale: {
+                    min: 0,
+                    max: 60,
+                    startAngle: 90,
+                    endAngle: 360 + 90
+                },
+                colors: [{
+                    color: '#6499E9'
+                }]
+            });
+            $("#second").kendoArcGauge({
+                value: new Date().getSeconds(),
+                centerTemplate: '<span style="color: #: color #;font-size: 25px;font-weight: 700;">#: value #초</span>',
+                scale: {
+                    min: 0,
+                    max: 60,
+                    startAngle: 90,
+                    endAngle: 360 + 90
+                },
+                colors: [{
+                    color: '#6499E9'
+                }]
+            });
+        }
     </script>
     @* template *@
+    <script id="My-Clock-template" type="text/x-kendo-template">
+        <div id="clock" style="width: 100%;text-align: center;position: absolute;top: 50%;transform: translate(0, -50%);">
+            <div id="hour" style="width: 200px;"></div>
+            <div id="minute" style="width: 200px;"></div>
+            <div id="second" style="width: 200px;"></div>
+        </div>
+    </script>
+    <script id="My-Signature-template" type="text/x-kendo-template">
+        <div id="signature" style="width: 100%; height: 100%;"></div>
+    </script>
     <script id="Gogle-Map-template" type="text/x-kendo-template">
         <iframe
         src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d1582.6601639638916!2d126.87385555824054!3d37.500362422882695!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x357c9e0cf302016d%3A0xd50e31f79fc96c41!2z7KSR7JWZ7Jyg7Ya164uo7KeA!5e0!3m2!1sko!2skr!4v1660715571476!5m2!1sko!2skr"
