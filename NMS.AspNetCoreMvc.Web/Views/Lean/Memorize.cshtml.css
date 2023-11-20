@@ -1,0 +1,33 @@
+﻿#cardInfo {
+    width: 80%;
+    margin: 20px auto auto auto;
+    border: 2px solid #dedede;
+}
+
+    #cardInfo tr:nth-child(1) td:nth-child(1) {
+        padding: 5px;
+        width: 20%;
+        text-align: center;
+    }
+
+    #cardInfo tr:nth-child(1) td:nth-child(2) {
+        padding: 5px;
+        text-align: left;
+    }
+
+    #cardInfo tr:nth-child(2) td {
+        padding: 5px;
+        width: 100%;
+    }
+
+.k-card {
+    width: 70vh;
+    margin: 20px auto auto auto;
+    padding: 10px;
+    background-color: #F3F3F3;
+}
+
+    .k-card #question {
+        height: 30vh;
+    }
+    

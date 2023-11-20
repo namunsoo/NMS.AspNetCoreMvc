@@ -1,138 +1,74 @@
 ﻿@{
-    Layout = "~/Views/Shared/_NoLayout.cshtml";
     ViewData["Title"] = "Memorize Page";
 }
 
 <script src="~/lib/Etc/xlsx.core.min.js"></script>
 @section Scripts {
     <script type="text/javascript">
+        var countProgress, workbook, exceljson, question, answer, count;
         $(document).ready(function () {
-            $("#toolbar").kendoToolBar({
-                items: [
-                    { template: '<a role="button" class="k-button k-button-solid-base k-button-solid k-button-md k-rounded-md" href="#">' + kendo.ui.icon({ icon: 'user' }) + '<span id="badge-overlay">2</span></a>' },
-                    { template: '<a role="button" class="k-button k-button-solid-base k-button-solid k-button-md k-rounded-md" href="#">' + kendo.ui.icon({ icon: 'envelop' }) + ' <span id="badge-inbox">5</span></a>' },
-                    { template: '<a role="button" class="k-button k-button-solid-base k-button-solid k-button-md k-rounded-md" href="#">암기 완료<span id="badge-sent">15</span></a>' },
-                    { template: '<a role="button" class="k-button k-button-solid-base k-button-solid k-button-md k-rounded-md" href="#">암기 중 <span id="badge-missed">99+</span></a>' }
-                ]
-            });
-            // 전체
-            // 기준 정하는거
-            $('#badge-overlay').kendoBadge({
-                themeColor: 'primary',
-                rounded: 'small'
-            });
 
-            $('#badge-inbox').kendoBadge({
-                themeColor: 'info',
-                rounded: 'medium'
-            });
+            countProgress = $("#countProgress").kendoProgressBar({
+                type: "value",
+                max: 0,
+                labelId: "countProgressLable",
+                ariaRole: true,
+                animation: false
+            }).data("kendoProgressBar");
 
-            $('#badge-sent').kendoBadge({
-                themeColor: 'success',
-                rounded: 'full'
-            });
+            question = $("#question").kendoTextArea({
+                readonly: true
+            }).data('kendoTextArea');
 
-            $('#badge-missed').kendoBadge({
-                themeColor: 'warning',
-                rounded: 'large'
-            });
-
-            $("#files").kendoUpload({
-                async: {
-                    chunkSize: 11000,// bytes
-                    autoUpload: true
-                },
-                multiple: false,
-                validation: {
-                    allowedExtensions: [".xls", ".xlsx"],
-                    maxFileSize: 4194304
-                },
-                select: function () {
-                    test()
-                }
-            });
-
+            answer = $('#answer').kendoExpansionPanel({
+                title: '정답',
+                subTitle: '확인하기',
+                collapse: OnCollapse,
+                expand: OnExpand
+            }).data('kendoExpansionPanel');
         });
-        // function test() {
-        //     var files = $('#files')[0].files[0]; //input file 객체를 가져온다.
-        //     var i, f;
-        //     var xlsxflag = false; /*Flag for checking whether excel is .xls format or .xlsx format*/
-        //     if ($("#files").val().toLowerCase().indexOf(".xlsx") > 0) {
-        //         xlsxflag = true;
-        //     }
-        //     for (i = 0; i != files.length; ++i) {
-        //         f = files[i];
-        //         var reader = new FileReader(); //FileReader를 생성한다.
-
-        //         //성공적으로 읽기 동작이 완료된 경우 실행되는 이벤트 핸들러를 설정한다.
-        //         reader.onload = function (e) {
-        //             var data = e.target.result;
-        //             /*Converts the excel data in to object*/
-        //             if (xlsxflag) {
-        //                 var workbook = XLSX.read(data, { type: 'binary' });
-        //             }
-        //             else {
-        //                 var workbook = XLS.read(data, { type: 'binary' });
-        //             }
-        //             /*Gets all the sheetnames of excel in to a variable*/
-        //             var sheet_name_list = workbook.SheetNames;
-
-        //             var cnt = 0; /*This is used for restricting the script to consider only first sheet of excel*/
-        //             sheet_name_list.forEach(function (y) { /*Iterate through all sheets*/
-        //                 /*Convert the cell value to Json*/
-        //                 if (xlsxflag) {
-        //                     var exceljson = XLSX.utils.sheet_to_json(workbook.Sheets[y]);
-        //                 }
-        //                 else {
-        //                     var exceljson = XLS.utils.sheet_to_row_object_array(workbook.Sheets[y]);
-        //                 }
-        //                 if (exceljson.length > 0 && cnt == 0) {
-        //                     alert(exceljson);
-        //                 }
-        //             });
-        //         };
-
-        //         //파일객체를 읽는다. 완료되면 원시 이진 데이터가 문자열로 포함됨.
-        //         reader.readAsBinaryString(f);
-
-        //     }//end. for
-        // }
 
         $("#files").on("change", function (e) {
-            var files = e.target.files; //input file 객체를 가져온다.
-            var i, f;
-            var xlsxflag = false; /*Flag for checking whether excel is .xls format or .xlsx format*/
+            let files = e.target.files; //input file 객체를 가져온다.
+            let i, f;
+            let xlsxflag = false; /*Flag for checking whether excel is .xls format or .xlsx format*/
             if ($("#files").val().toLowerCase().indexOf(".xlsx") > 0) {
                 xlsxflag = true;
             }
             for (i = 0; i != files.length; ++i) {
                 f = files[i];
-                var reader = new FileReader(); //FileReader를 생성한다.
+                let reader = new FileReader(); //FileReader를 생성한다.
 
                 //성공적으로 읽기 동작이 완료된 경우 실행되는 이벤트 핸들러를 설정한다.
                 reader.onload = function (e) {
-                    var data = e.target.result;
+                    let data = e.target.result;
                     /*Converts the excel data in to object*/
                     if (xlsxflag) {
-                        var workbook = XLSX.read(data, { type: 'binary' });
+                        workbook = XLSX.read(data, { type: 'binary' });
                     }
                     else {
-                        var workbook = XLS.read(data, { type: 'binary' });
+                        workbook = XLS.read(data, { type: 'binary' });
                     }
                     /*Gets all the sheetnames of excel in to a variable*/
-                    var sheet_name_list = workbook.SheetNames;
+                    let sheet_name_list = workbook.SheetNames;
 
-                    var cnt = 0; /*This is used for restricting the script to consider only first sheet of excel*/
+                    // var cnt = 0; /*This is used for restricting the script to consider only first sheet of excel*/
                     sheet_name_list.forEach(function (y) { /*Iterate through all sheets*/
                         /*Convert the cell value to Json*/
                         if (xlsxflag) {
-                            var exceljson = XLSX.utils.sheet_to_json(workbook.Sheets[y]);
+                            exceljson = XLSX.utils.sheet_to_json(workbook.Sheets[y], { header: ["question", "answer"] });
                         }
                         else {
-                            var exceljson = XLS.utils.sheet_to_row_object_array(workbook.Sheets[y]);
+                            exceljson = XLS.utils.sheet_to_row_object_array(workbook.Sheets[y], { header: ["question", "answer"] });
                         }
-                        if (exceljson.length > 0 && cnt == 0) {
-                            alert(exceljson);
+
+                        if (exceljson.length > 0) {
+                            count = 0;
+                            countProgress.options.max = exceljson.length;
+                            countProgress.value(0);
+                            question.value(exceljson[0]['question']);
+                            $('#answerText').text(exceljson[0]['answer']);
+                            // alert(exceljson);
                         }
                     });
                 };
@@ -144,60 +80,59 @@
 
         });
 
-        // $("#files").on("change", function (e) {
-        //     var xlsxflag = false; /*Flag for checking whether excel is .xls format or .xlsx format*/
-        //     if ($("#files").val().toLowerCase().indexOf(".xlsx") > 0) {
-        //         xlsxflag = true;
-        //     }
-        //     var files = e.target.files; //input file 객체를 가져온다.
-        //     var i, f;
-        //     for (i = 0; i != files.length; ++i) {
-        //         f = files[i];
-        //         var reader = new FileReader(); //FileReader를 생성한다.
-
-        //         //성공적으로 읽기 동작이 완료된 경우 실행되는 이벤트 핸들러를 설정한다.
-        //         reader.onload = function (e) {
-        //             var data = e.target.result;
-        //             /*Converts the excel data in to object*/
-        //             if (xlsxflag) {
-        //                 var workbook = XLSX.read(data, { type: 'binary' });
-        //             }
-        //             else {
-        //                 var workbook = XLS.read(data, { type: 'binary' });
-        //             }
-        //             /*Gets all the sheetnames of excel in to a variable*/
-        //             var sheet_name_list = workbook.SheetNames;
-
-        //             var cnt = 0; /*This is used for restricting the script to consider only first sheet of excel*/
-        //             sheet_name_list.forEach(function (y) { /*Iterate through all sheets*/
-        //                 /*Convert the cell value to Json*/
-        //                 if (xlsxflag) {
-        //                     var exceljson = XLSX.utils.sheet_to_json(workbook.Sheets[y]);
-        //                 }
-        //                 else {
-        //                     var exceljson = XLS.utils.sheet_to_row_object_array(workbook.Sheets[y]);
-        //                 }
-        //                 if (exceljson.length > 0 && cnt == 0) {
-        //                     alert(exceljson)
-        //                 }
-        //             });
-
-        //         };
-
-        //         //파일객체를 읽는다. 완료되면 원시 이진 데이터가 문자열로 포함됨.
-        //         reader.readAsBinaryString(f);
-
-        //     }//end. for
-
-        // });
-
-
+        function GoBefore() {
+            if (typeof count == "number" && count >= 1) {
+                count -= 1;
+                answer.toggle(false);
+                countProgress.value(count);
+                question.value(exceljson[count]['question']);
+                $('#answerText').text(exceljson[count]['answer']);
+            }
+        }
+        function GoNext() {
+            if (typeof count == "number" && count+1 < exceljson.length) {
+                count += 1;
+                answer.toggle(false);
+                countProgress.value(count);
+                question.value(exceljson[count]['question']);
+                $('#answerText').text(exceljson[count]['answer']);
+            }
+        }
+        function OnCollapse() {
+            $('#answerText').css('display', 'none');
+        }
+        function OnExpand() {
+            $('#answerText').css('display', 'block');
+        }
         //# sourceURL=debugScript
     </script>
 }
 
 <div>
-    <div id="toolbar"></div>
-    <input name="files" id="files" type="file" aria-label="files" />
+    <table id="cardInfo">
+        <tr>
+            <td>
+                <div>파일&nbsp;선택</div>
+            </td>
+            <td>
+                <input name="files" id="files" type="file" aria-label="files" />
+            </td>
+        </tr>
+        <tr>
+            <td colspan="2">
+                <div id="countProgress"></div>
+            </td>
+        </tr>
+    </table>
+    <div class="k-card k-card-vertical k-text-center">
+        <div class="k-card-actions k-card-actions-stretched k-card-actions-horizontal">
+            <button class="k-button k-button-flat-base k-button-flat k-button-md k-rounded-md" onclick="GoBefore();">이전</button>
+            <button class="k-button k-button-flat-primary k-button-flat k-button-md k-rounded-md" onclick="GoNext();">다음</button>
+        </div>
+        <textarea id="question"></textarea>
+        <div id="answer">
+            <div id="answerText"></div>
+        </div>
+    </div>
 </div>
 
