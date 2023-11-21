@@ -19,8 +19,8 @@ if __name__ == "__main__":
     
     # OneLetter
     directory = 'C:\\Users\\namunsoo\\Downloads\\AI_Data\\OneLetter'
-    img_width = 180
-    img_height = 180
+    img_width = 200
+    img_height = 200
     batch_size = 32
     train_ds, val_ds = keras.utils.image_dataset_from_directory(
         directory,
@@ -42,15 +42,17 @@ if __name__ == "__main__":
     
     model = Sequential([
         layers.Rescaling(1./255, input_shape=(img_height, img_width, 1)),
-        layers.Conv2D(16, 3, padding='same', activation='relu'),
+        layers.Conv2D(16, (3, 3), activation='relu'),
         layers.MaxPooling2D(),
-        layers.Conv2D(32, 3, padding='same', activation='relu'),
+        layers.Conv2D(32, (3, 3), activation='relu'),
         layers.MaxPooling2D(),
-        layers.Conv2D(64, 3, padding='same', activation='relu'),
+        layers.Conv2D(64, (3, 3), activation='relu'),
+        layers.MaxPooling2D(),
+        layers.Conv2D(128, (3, 3), activation='relu'),
         layers.MaxPooling2D(),
         layers.Dropout(0.2),
         layers.Flatten(),
-        layers.Dense(128, activation='relu'),
+        layers.Dense(12800, activation='relu'),
         layers.Dense(num_classes)
     ])
     
@@ -58,16 +60,22 @@ if __name__ == "__main__":
         loss=keras.losses.SparseCategoricalCrossentropy(from_logits=True),
         metrics=[keras.metrics.SparseCategoricalAccuracy()])
     
-    # model.summary()
+    model.summary()
 
-    model.fit(
-        train_ds,
-        validation_data=val_ds,
-        epochs=15
-    )
-    
-    model.save('my_model.keras')
-    test_loss, test_acc = model.evaluate(val_ds)
-    print(f'Test accuracy: {test_acc}')
+    # img = cv2.imread('test.png', cv2.COLOR_BGR2GRAY)
+    # img = cv2.resize(img, (100,100), interpolation = cv2.INTER_AREA)
+    # cv2.imshow('image', img)
+    # cv2.waitKey(0)
+    # cv2.destroyAllWindows()
+
+    for i in range(1,16):
+        model.fit(
+            train_ds,
+            validation_data=val_ds,
+            epochs=1
+        )
+        model.save('my_model_epochs_'+i+'.keras')
+    # test_loss, test_acc = model.evaluate(val_ds)
+    # print(f'Test accuracy: {test_acc}')
 
     

@@ -32,57 +32,60 @@
             let files = e.target.files; //input file 객체를 가져온다.
             let i, f;
             let xlsxflag = false; /*Flag for checking whether excel is .xls format or .xlsx format*/
-            if ($("#files").val().toLowerCase().indexOf(".xlsx") > 0) {
-                xlsxflag = true;
-            }
-            for (i = 0; i != files.length; ++i) {
-                f = files[i];
-                let reader = new FileReader(); //FileReader를 생성한다.
+            if ($("#files").val().toLowerCase().indexOf(".xlsx") > 0 || $("#files").val().toLowerCase().indexOf(".xls") > 0) {
+                xlsxflag = $("#files").val().toLowerCase().indexOf(".xlsx") > 0;
+                for (i = 0; i != files.length; ++i) {
+                    f = files[i];
+                    let reader = new FileReader(); //FileReader를 생성한다.
 
-                //성공적으로 읽기 동작이 완료된 경우 실행되는 이벤트 핸들러를 설정한다.
-                reader.onload = function (e) {
-                    let data = e.target.result;
-                    /*Converts the excel data in to object*/
-                    if (xlsxflag) {
-                        workbook = XLSX.read(data, { type: 'binary' });
-                    }
-                    else {
-                        workbook = XLS.read(data, { type: 'binary' });
-                    }
-                    /*Gets all the sheetnames of excel in to a variable*/
-                    let sheet_name_list = workbook.SheetNames;
-
-                    // var cnt = 0; /*This is used for restricting the script to consider only first sheet of excel*/
-                    sheet_name_list.forEach(function (y) { /*Iterate through all sheets*/
-                        /*Convert the cell value to Json*/
+                    //성공적으로 읽기 동작이 완료된 경우 실행되는 이벤트 핸들러를 설정한다.
+                    reader.onload = function (e) {
+                        let data = e.target.result;
+                        /*Converts the excel data in to object*/
                         if (xlsxflag) {
-                            exceljson = XLSX.utils.sheet_to_json(workbook.Sheets[y], { header: ["question", "answer"] });
+                            workbook = XLSX.read(data, { type: 'binary' });
                         }
                         else {
-                            exceljson = XLS.utils.sheet_to_row_object_array(workbook.Sheets[y], { header: ["question", "answer"] });
+                            workbook = XLS.read(data, { type: 'binary' });
                         }
+                        /*Gets all the sheetnames of excel in to a variable*/
+                        let sheet_name_list = workbook.SheetNames;
 
-                        if (exceljson.length > 0) {
-                            count = 0;
-                            countProgress.options.max = exceljson.length;
-                            countProgress.value(0);
-                            question.value(exceljson[0]['question']);
-                            $('#answerText').text(exceljson[0]['answer']);
-                            // alert(exceljson);
-                        }
-                    });
-                };
+                        // var cnt = 0; /*This is used for restricting the script to consider only first sheet of excel*/
+                        sheet_name_list.forEach(function (y) { /*Iterate through all sheets*/
+                            /*Convert the cell value to Json*/
+                            if (xlsxflag) {
+                                exceljson = XLSX.utils.sheet_to_json(workbook.Sheets[y], { header: ["question", "answer"] });
+                            }
+                            else {
+                                exceljson = XLS.utils.sheet_to_row_object_array(workbook.Sheets[y], { header: ["question", "answer"] });
+                            }
 
-                //파일객체를 읽는다. 완료되면 원시 이진 데이터가 문자열로 포함됨.
-                reader.readAsBinaryString(f);
+                            if (exceljson.length > 0) {
+                                count = 0;
+                                countProgress.options.max = exceljson.length;
+                                countProgress.value(0);
+                                question.value(exceljson[0]['question']);
+                                $('#answerText').text(exceljson[0]['answer']);
+                                // alert(exceljson);
+                            }
+                        });
+                    };
 
-            }//end. for
+                    //파일객체를 읽는다. 완료되면 원시 이진 데이터가 문자열로 포함됨.
+                    reader.readAsBinaryString(f);
+
+                }//end. for
+            } else {
+                alert('엑셀 파일만 가능합니다.');
+            }
 
         });
 
         function GoBefore() {
             if (typeof count == "number" && count >= 1) {
                 count -= 1;
+                $('#answerText').css('display', 'none');
                 answer.toggle(false);
                 countProgress.value(count);
                 question.value(exceljson[count]['question']);
@@ -92,6 +95,7 @@
         function GoNext() {
             if (typeof count == "number" && count+1 < exceljson.length) {
                 count += 1;
+                $('#answerText').css('display', 'none');
                 answer.toggle(false);
                 countProgress.value(count);
                 question.value(exceljson[count]['question']);
