@@ -74,7 +74,7 @@ if __name__ == "__main__":
             validation_data=val_ds,
             epochs=1
         )
-        model.save('my_model_epochs_'+i+'.keras')
+        model.save('my_model_epochs_'+str(i)+'.keras')
     # test_loss, test_acc = model.evaluate(val_ds)
     # print(f'Test accuracy: {test_acc}')
 
